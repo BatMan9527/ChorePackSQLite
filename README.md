@@ -7,7 +7,7 @@
 ```
 project/
 ├── data/
-│   ├── ZWCAD_Arch/          # 数据库目标目录
+│   ├── World/          # 数据库目标目录
 │   │   ├── schema.sql       # 表结构定义（可选）
 │   │   ├── tables/          # 数据文件目录
 │   │   │   ├── tables.config    # 表配置：指定需要处理的CSV表名列表
@@ -18,11 +18,7 @@ project/
 │   │       ├── tables.config # 文件表配置：指定需要创建的表名列表
 │   │       └── {表名}/      # 子目录名即为表名
 │   │           └── *.bin    # 子目录中的文件
-│   ├── ZArchDialogInfo/
-│   ├── USERCompLib/
-│   ├── DynamicCompLib/
-│   ├── DWGCompLib/
-│   └── 3DCompLib/
+│   └── Others/
 │
 ├── scripts/
 │   ├── build_db.py          # 生成 db3 文件
@@ -96,7 +92,7 @@ python scripts/build_db.py --all
 
 #### 生成指定的数据库
 ```bash
-python scripts/build_db.py ZWCAD_Arch USERCompLib DWGCompLib
+python scripts/build_db.py World
 ```
 
 #### 为data目录现有数据生成配置文件
@@ -118,12 +114,12 @@ python scripts/export_db.py --all
 
 #### 导出指定的数据库
 ```bash
-python scripts/export_db.py ZWCAD_Arch USERCompLib
+python scripts/export_db.py World
 ```
 
 #### 显示详细表信息
 ```bash
-python scripts/export_db.py ZWCAD_Arch --info
+python scripts/export_db.py World --info
 ```
 
 #### 列出所有可用的数据库文件
@@ -133,7 +129,7 @@ python scripts/export_db.py --list
 
 ## 数据库目标目录结构说明
 
-每个数据库目标目录（如 `ZWCAD_Arch`）应包含：
+每个数据库目标目录（如 `World`）应包含：
 
 ### 1. schema.sql（可选）
 表结构定义。如果不存在，脚本会为CSV和文件表自动创建表结构。
@@ -163,7 +159,7 @@ python scripts/export_db.py --list
   - `tables.config` 不会被导入
   - 示例：
     ```
-    database.name=ZWCAD_Arch.db3
+    database.name=World.db3
     database.version=1.0.0
     arch.enabled=true
     ```
@@ -185,43 +181,34 @@ python scripts/export_db.py --list
   ```
 
 - **{表名}/**：子目录
-  - 子目录名对应 `tables.yaml` 中配置的表名
+  - 子目录名对应 `tables.config` 中配置的表名
   - 每个子目录中的文件会被存储到对应的表中
   - 表结构：`ID`（自动递增），`code`（文件名），`file_blob`（文件内容）
 
-## 当前可用的数据库目标
-
-- ZWCAD_Arch
-- ZArchDialogInfo
-- USERCompLib
-- DynamicCompLib
-- DWGCompLib
-- 3DCompLib
 
 ## 输出
 
 生成的数据库文件将保存在 `build/` 目录下，文件名格式为 `{目标名称}.db3`。
 
 例如：
-- `build/ZWCAD_Arch.db3`
-- `build/USERCompLib.db3`
+- `build/World.db3`
 
 ## 工作流程示例
 
 1. **准备数据**：
-   - 在 `data/ZWCAD_Arch/tables/` 中创建 `tables.yaml` 配置文件
+   - 在 `data/World/tables/` 中创建 `tables.config` 配置文件
    - 创建对应的 CSV 文件（如 `users.csv`）
-   - 在 `data/ZWCAD_Arch/files/` 中创建 `tables.yaml` 配置文件
+   - 在 `data/World/files/` 中创建 `tables.config` 配置文件
    - 创建对应的子目录（如 `images/`）并在其中放置文件
 
 2. **生成数据库**：
    ```bash
-   python scripts/build_db.py ZWCAD_Arch
+   python scripts/build_db.py World
    ```
 
 3. **验证结果**：
    ```bash
-   python scripts/export_db.py ZWCAD_Arch --info
+   python scripts/export_db.py World --info
    ```
 
 ## 注意事项
@@ -238,15 +225,6 @@ python scripts/export_db.py --list
 
 # 导出 db3 文件使用指南
 
-## 当前 build 目录下的 db3 文件
-
-根据项目结构，build 目录下有以下 db3 文件：
-- `3DCompLib.db3`
-- `DWGCompLib.db3`
-- `USERCompLib.db3`
-- `DynamicCompLib.db3`
-- `ZArchDialogInfo.db3`
-- `ZWCAD_Arch.db3`
 
 ## 导出方法
 
@@ -264,10 +242,10 @@ python scripts/export_db.py --all
 
 ```bash
 # 导出单个数据库
-python scripts/export_db.py ZWCAD_Arch
+python scripts/export_db.py World
 
 # 导出多个数据库
-python scripts/export_db.py ZWCAD_Arch USERCompLib DWGCompLib
+python scripts/export_db.py World Others
 ```
 
 ### 方法 3: 导出指定 db3 文件到同目录下
@@ -276,12 +254,11 @@ python scripts/export_db.py ZWCAD_Arch USERCompLib DWGCompLib
 
 ```bash
 # 导出单个文件到同目录下
-python scripts/export_db.py --file build/ZWCAD_Arch.db3
+python scripts/export_db.py --file build/World.db3
 
 # 导出多个文件到各自的目录下
-python scripts/export_db.py --file build/ZWCAD_Arch.db3
-python scripts/export_db.py --file build/USERCompLib.db3
-python scripts/export_db.py --file build/DWGCompLib.db3
+python scripts/export_db.py --file build/World.db3
+python scripts/export_db.py --file build/Other.db3
 ```
 
 ### 方法 4: 导出到指定目录
@@ -289,7 +266,7 @@ python scripts/export_db.py --file build/DWGCompLib.db3
 将 db3 文件导出到指定的目录：
 
 ```bash
-python scripts/export_db.py --file build/ZWCAD_Arch.db3 --output output_dir
+python scripts/export_db.py --file build/World.db3 --output output_dir
 ```
 
 ## 导出结构说明
@@ -300,14 +277,14 @@ python scripts/export_db.py --file build/ZWCAD_Arch.db3 --output output_dir
 ```
 build/
 └── export/
-    ├── ZWCAD_Arch/
+    ├── World/
     │   ├── tables/
     │   │   ├── *.csv
     │   │   └── *.json
     │   └── files/
     │       └── {表名}/
     │           └── *.bin
-    ├── USERCompLib/
+    ├── Others/
     │   └── ...
     └── ...
 ```
@@ -317,7 +294,7 @@ build/
 导出结构（在 db3 文件所在目录）：
 ```
 build/
-├── ZWCAD_Arch.db3
+├── World.db3
 ├── tables/
 │   ├── *.csv
 │   └── *.json
@@ -332,7 +309,7 @@ build/
 
 ```bash
 # 查看指定文件的所有表信息
-python scripts/export_db.py --file build/ZWCAD_Arch.db3 --info
+python scripts/export_db.py --file build/World.db3 --info
 
 # 查看所有可用数据库
 python scripts/export_db.py --list
@@ -390,16 +367,16 @@ for db_file in build_dir.glob("*.db3"):
 
 ```bash
 # 默认：只导出 CSV（推荐）
-python scripts/export_db.py --file build/ZWCAD_Arch.db3
+python scripts/export_db.py --file build/World.db3
 
 # 同时导出 CSV 和 JSON
-python scripts/export_db.py --file build/ZWCAD_Arch.db3 --json
+python scripts/export_db.py --file build/World.db3 --json
 
 # 只导出 JSON（不导出 CSV）
-python scripts/export_db.py --file build/ZWCAD_Arch.db3 --no-csv --json
+python scripts/export_db.py --file build/World.db3 --no-csv --json
 
 # 明确指定导出 CSV（默认行为，可选）
-python scripts/export_db.py --file build/ZWCAD_Arch.db3 --csv
+python scripts/export_db.py --file build/World.db3 --csv
 ```
 
 ## 注意事项
@@ -436,10 +413,10 @@ python scripts/sync_from_build.py
 
 ### 同步结果
 
-对于 `build/ZWCAD_Arch.db3`，会同步到：
+对于 `build/World.db3`，会同步到：
 ```
 data/
-└── ZWCAD_Arch/
+└── World/
     ├── tables/
     │   ├── users.csv
     │   ├── config.csv
@@ -470,19 +447,19 @@ data/
 ## 示例输出
 
 ```
-找到 6 个 db3 文件
+找到 1 个 db3 文件
 开始同步到 data 目录...
 
 ============================================================
-同步数据库: ZWCAD_Arch
-源文件: build\ZWCAD_Arch.db3
-目标目录: data\ZWCAD_Arch
+同步数据库: World
+源文件: build\World.db3
+目标目录: data\World
 ============================================================
 ...
-✓ ZWCAD_Arch 同步成功
+✓ World 同步成功
 
 ============================================================
-同步完成: 6/6 个数据库同步成功
+同步完成: 1/1 个数据库同步成功
 ============================================================
 
 ✓ 所有数据库已成功同步到 data 目录
