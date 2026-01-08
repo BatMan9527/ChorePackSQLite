@@ -21,16 +21,7 @@ def create_database(db_path: str, schema_path: Path):
         with open(schema_path, 'r', encoding='utf-8') as f:
             schema = f.read()
             cursor.executescript(schema)
-    else:
-        # Create default config table if no schema
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS config (
-                key TEXT PRIMARY KEY,
-                value TEXT NOT NULL,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-    
+
     conn.commit()
     return conn
 
